@@ -445,5 +445,5 @@ class InsightGenerator:
             "note": "Mock insights generated - configure AI for real analysis"
         }
 
-# Singleton instance
+# Singleton Instance
 insight_generator = InsightGenerator()

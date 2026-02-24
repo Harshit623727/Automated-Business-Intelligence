@@ -857,9 +857,8 @@ def render_export_section(metrics, insights):
         if st.button("📋 Copy Dataset ID", use_container_width=True):
             st.code(st.session_state.dataset_id, language="text")
 
-# ----------------------------------------------------------------------
+
 # Main Dashboard
-# ----------------------------------------------------------------------
 def main():
     """Main dashboard application"""
     
