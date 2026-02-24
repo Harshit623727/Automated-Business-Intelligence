@@ -18,18 +18,12 @@ services:
       - key: ENVIRONMENT
         value: production
 
-  # PostgreSQL Database Service
+  # PostgreSQL Database Service (Render automatically uses latest stable version)
   - type: pserv
     name: automated-bi-db
     env: postgres
-    plan: free  # Upgrade to starter ($7/mo) for production
-    
-    # Database version - Correct placement
-    spec:
-      postgresVersion: 15
-    
-    # Disk configuration (persistent storage)
+    plan: free
     disk:
       name: postgres-data
       mountPath: /var/lib/postgresql/data
-      sizeGB: 1  # 1GB is enough for demo, increase to 10GB for production
+      sizeGB: 1
