@@ -12,6 +12,12 @@ sqlalchemy==2.0.23
 alembic==1.12.1
 psycopg2-binary==2.9.9
 
+pydantic==2.5.0
+pydantic-settings==2.0.0
+
+
+# pydantic[email]==1.10.13
+
 # AI Integration (Optional)
 openai==0.28.1
 
@@ -23,8 +29,3 @@ httpx==0.25.1
 # Utilities
 python-multipart==0.0.6
 email-validator==2.1.0
-pydantic[email]==1.10.13
-
-
-pydantic==2.5.0
-pydantic-settings==2.0.0

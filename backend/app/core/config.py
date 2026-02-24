@@ -5,7 +5,7 @@ Loads and validates environment variables
 import os
 from typing import Optional, List
 from pydantic import validator
-from pydantic_settings import BaseSettings  # ✅ FIXED IMPORT
+from pydantic_settings import BaseSettings
 from dotenv import load_dotenv
 
 load_dotenv()
