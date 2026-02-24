@@ -1,14 +1,18 @@
 services:
-  # Backend API Service
+  # Backend API Service - USING PYTHON BUILD (not Docker)
   - type: web
     name: automated-bi-backend
     runtime: python
-    repo: https://github.com/yourusername/automated-bi-saas  # Replace with your repo
+    repo: https://github.com/Harshit623727/Automated-Business-Intelligence
     branch: main
     buildCommand: pip install -r backend/requirements.txt
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /health
     autoDeploy: true
+    
+    #Set root directory to backend/
+    rootDir: backend
+    
     envVars:
       - key: DATABASE_URL
         fromDatabase:
@@ -23,10 +27,10 @@ services:
       - key: PYTHON_VERSION
         value: 3.11.0
 
-# PostgreSQL Database (Separate section, not under services)
+# PostgreSQL Database
 databases:
   - name: automated-bi-db
     databaseName: automated_bi
     user: automated_bi_user
-    plan: free  # Free tier doesn't have disk, it's ephemeral
+    plan: free
     postgresMajorVersion: 15
