@@ -2,10 +2,13 @@ services:
   # Backend API Service
   - type: web
     name: automated-bi-backend
-    env: python
+    runtime: python
+    repo: https://github.com/yourusername/automated-bi-saas  # Replace with your repo
+    branch: main
     buildCommand: pip install -r backend/requirements.txt
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /health
+    autoDeploy: true
     envVars:
       - key: DATABASE_URL
         fromDatabase:
@@ -17,13 +20,13 @@ services:
         generateValue: true
       - key: ENVIRONMENT
         value: production
+      - key: PYTHON_VERSION
+        value: 3.11.0
 
-  # PostgreSQL Database Service (Render automatically uses latest stable version)
-  - type: pserv
-    name: automated-bi-db
-    env: postgres
-    plan: free
-    disk:
-      name: postgres-data
-      mountPath: /var/lib/postgresql/data
-      sizeGB: 1
+# PostgreSQL Database (Separate section, not under services)
+databases:
+  - name: automated-bi-db
+    databaseName: automated_bi
+    user: automated_bi_user
+    plan: free  # Free tier doesn't have disk, it's ephemeral
+    postgresMajorVersion: 15
