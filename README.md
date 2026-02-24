@@ -1,4 +1,4 @@
-🚧 Project under active development
+
 
 
 # Automated Business Intelligence SaaS Platform
