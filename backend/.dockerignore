@@ -1,0 +1,84 @@
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Virtual environment
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+pythonenv*
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Data files - Don't copy database into image!
+data/
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+logs/
+*.log
+
+# Tests and notebooks - Not needed in production
+tests/
+notebooks/
+*.ipynb
+
+# Documentation
+README.md
+LICENSE
+docs/
+
+# Docker itself
+Dockerfile
+.dockerignore
+
+# Local development files
+docker-compose.yml
+docker-compose*.yml
+
+# Backup files
+*.bak
+*.backup
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+
+# Uploads (should be mounted as volume, not copied)
+uploads/
+processed/

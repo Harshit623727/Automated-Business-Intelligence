@@ -17,8 +17,8 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = "Automated BI API"
     VERSION: str = "1.0.0"
     
-    # Database
-    DATABASE_URL: str = "sqlite:///./data/automated_bi.db"
+    # Database - CRITICAL: This MUST come from environment in production
+    DATABASE_URL: Optional[str] = None
     
     # OpenAI
     OPENAI_API_KEY: Optional[str] = None
@@ -30,11 +30,11 @@ class Settings(BaseSettings):
     
     # CORS
     BACKEND_CORS_ORIGINS: List[str] = [
-        "http://localhost:8501",  # Streamlit local
-        "http://localhost:8000",  # FastAPI local
-        "https://*.streamlit.app",  # Streamlit Cloud
-        "https://*.onrender.com",  # Render
-        "https://*.railway.app"    # Railway
+        "http://localhost:8501",
+        "http://localhost:8000",
+        "https://*.streamlit.app",
+        "https://*.onrender.com",
+        "https://*.railway.app"
     ]
     
     # Logging
@@ -44,14 +44,45 @@ class Settings(BaseSettings):
     MAX_UPLOAD_SIZE: int = 100 * 1024 * 1024  # 100MB
     ALLOWED_EXTENSIONS: List[str] = [".csv", ".xlsx", ".xls"]
     
+    # Environment detection
+    ENVIRONMENT: str = "development"  # development, production, testing
+    
     @validator("DATABASE_URL", pre=True)
-    def validate_database_url(cls, v: str) -> str:
-        """Ensure database URL is properly formatted"""
-        if v.startswith("sqlite"):
-            # Ensure directory exists
-            db_path = v.replace("sqlite:///", "")
-            os.makedirs(os.path.dirname(db_path) or ".", exist_ok=True)
-        return v
+    def validate_database_url(cls, v: str, values: dict) -> str:
+        """
+        Validate database URL and set defaults based on environment
+        CRITICAL: In production, this MUST be provided via environment
+        """
+        # If DATABASE_URL is provided, use it (Render PostgreSQL)
+        if v:
+            return v
+        
+        # Check if we're in production but no DATABASE_URL
+        environment = values.get("ENVIRONMENT", "development")
+        if environment == "production":
+            raise ValueError(
+                "DATABASE_URL must be set in production environment. "
+                "Check Render dashboard for PostgreSQL connection string."
+            )
+        
+        # Development fallback - SQLite
+        import os
+        from pathlib import Path
+        
+        # Create data directory if it doesn't exist
+        data_dir = Path(__file__).parent.parent.parent / "data"
+        data_dir.mkdir(exist_ok=True)
+        
+        db_path = data_dir / "automated_bi.db"
+        return f"sqlite:///{db_path}"
+    
+    @validator("ENVIRONMENT")
+    def detect_environment(cls, v: str) -> str:
+        """Auto-detect production environment"""
+        # Check for Render/Railway environment variables
+        if os.getenv("RENDER") or os.getenv("RAILWAY_STATIC_URL"):
+            return "production"
+        return v or "development"
     
     class Config:
         env_file = ".env"

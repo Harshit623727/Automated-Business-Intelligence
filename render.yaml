@@ -1,0 +1,58 @@
+# render.yaml - Infrastructure as Code for Render Deployment
+# This file defines both the web service and PostgreSQL database
+
+services:
+  # =====================================================================
+  # Backend API Service
+  # =====================================================================
+  - type: web
+    name: automated-bi-backend
+    env: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    
+    # Environment Variables
+    envVars:
+      # Database connection from the PostgreSQL service below
+      - key: DATABASE_URL
+        fromDatabase:
+          name: automated-bi-db
+          property: connectionString
+      
+      # Application configuration
+      - key: LOG_LEVEL
+        value: INFO
+      
+      - key: ENVIRONMENT
+        value: production
+      
+      # Security - auto-generated on first deploy
+      - key: SECRET_KEY
+        generateValue: true
+      
+      # OpenAI API key (optional - set manually in dashboard)
+      - key: OPENAI_API_KEY
+        sync: false  # Don't sync from this file, set manually
+      
+      # CORS - Allow frontend
+      - key: BACKEND_CORS_ORIGINS
+        value: https://*.onrender.com,https://*.streamlit.app
+
+  # =====================================================================
+  # PostgreSQL Database Service
+  # =====================================================================
+  - type: pserv
+    name: automated-bi-db
+    env: postgres
+    plan: free  # Upgrade to starter ($7/mo) for production
+    
+    # Database version
+    postgresMajorVersion: 15
+    
+    # Disk configuration (persistent storage)
+    disk:
+      name: postgres-data
+      mountPath: /var/lib/postgresql/data
+      sizeGB: 1  # 1GB is enough for demo, increase to 10GB for production
