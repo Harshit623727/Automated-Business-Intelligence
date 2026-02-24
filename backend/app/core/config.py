@@ -4,7 +4,8 @@ Loads and validates environment variables
 """
 import os
 from typing import Optional, List
-from pydantic import BaseSettings, validator
+from pydantic import validator
+from pydantic_settings import BaseSettings  # ✅ FIXED IMPORT
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -17,7 +18,7 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = "Automated BI API"
     VERSION: str = "1.0.0"
     
-    # Database - CRITICAL: This MUST come from environment in production
+    # Database
     DATABASE_URL: Optional[str] = None
     
     # OpenAI
@@ -44,20 +45,15 @@ class Settings(BaseSettings):
     MAX_UPLOAD_SIZE: int = 100 * 1024 * 1024  # 100MB
     ALLOWED_EXTENSIONS: List[str] = [".csv", ".xlsx", ".xls"]
     
-    # Environment detection
-    ENVIRONMENT: str = "development"  # development, production, testing
+    # Environment
+    ENVIRONMENT: str = "development"
     
     @validator("DATABASE_URL", pre=True)
     def validate_database_url(cls, v: str, values: dict) -> str:
-        """
-        Validate database URL and set defaults based on environment
-        CRITICAL: In production, this MUST be provided via environment
-        """
-        # If DATABASE_URL is provided, use it (Render PostgreSQL)
+        """Validate database URL and set defaults based on environment"""
         if v:
             return v
         
-        # Check if we're in production but no DATABASE_URL
         environment = values.get("ENVIRONMENT", "development")
         if environment == "production":
             raise ValueError(
@@ -69,7 +65,6 @@ class Settings(BaseSettings):
         import os
         from pathlib import Path
         
-        # Create data directory if it doesn't exist
         data_dir = Path(__file__).parent.parent.parent / "data"
         data_dir.mkdir(exist_ok=True)
         
@@ -79,7 +74,6 @@ class Settings(BaseSettings):
     @validator("ENVIRONMENT")
     def detect_environment(cls, v: str) -> str:
         """Auto-detect production environment"""
-        # Check for Render/Railway environment variables
         if os.getenv("RENDER") or os.getenv("RAILWAY_STATIC_URL"):
             return "production"
         return v or "development"
